@@ -20,11 +20,8 @@ function draw_anim(context:any, iobj:any, transform:any) { // context is the can
     iobj.current = (iobj.current+1) % iobj.total_frames;
     transform.y += transform.vspeed;
     transform.x += transform.hspeed;
-    
-}
+    }
 
-  //  x+=1;
-                   // incrementing the current frame and assuring animation loop
 }
 export function drawCharacter(context:any, src:any, obj:any, transform:any) {
     img.onload = function () { // Triggered when image has finished loading.

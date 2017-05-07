@@ -1,7 +1,11 @@
+///<reference path='./ts/tile.ts' />
 import { drawCharacter } from "./ts/sprite";
 import { setOnDownCallback } from "./ts/input";
 import { setOnUpCallback } from "./ts/input";
 import { getKeyDir } from "./ts/input";
+import { initTile } from "./ts/tile";
+import { OrthogonalMap } from "./ts/tile";
+
 var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
@@ -11,6 +15,33 @@ var myGameArea = {
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
     }
 }
+
+
+// Map tile data
+const mapData = [
+  [1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0]
+]
+
+
 var booms = new Array();
 var canSetBoom = true;
 var img_obj = {
@@ -48,6 +79,7 @@ var onUp = function (key:any){
 }
 
 function onUpdate(){
+    
     if((getKeyDir() & 1) != 0){
         transform.hspeed = -5;
         img_obj.origin = 1;
@@ -77,24 +109,32 @@ function onUpdate(){
         }
         index++;
     });
+    
 }
 
 var background = new Image();
 var runnerImage = new Image();
 var boom = new Image();
-
-function initializeImages() {
+var map:OrthogonalMap;
+async function initializeImages() {
+    myGameArea.start();
+    var load = initTile().then(function(count){
+        map = new OrthogonalMap(myGameArea.canvas, mapData, { tileSize: 40 })
+    }).catch(function(reason){
+            console.log(reason);
+    })
+    var val = await load;
     background.src = 'assets/desert.png';
-    boom.src = 'assets/bomb.png'
-    background.onload = function (e:any) {
-        myGameArea.start();
-        setOnDownCallback(onDown);
-        setOnUpCallback(onUp);
-        loop()
-    };
+        boom.src = 'assets/bomb.png'
+        background.onload = function (e:any) {
+            
+            setOnDownCallback(onDown);
+            setOnUpCallback(onUp);
+            loop()
+        };
+    
 }
 function loop(){
-
     setInterval(function () {
                     onUpdate();
                     onDraw();
@@ -118,6 +158,7 @@ function onDraw() {
     context.save();
     context.clearRect(0, 0, 800, 600);
     drawBackground();
+    map.draw();
     booms.forEach(element => {
         myGameArea.canvas.getContext("2d").drawImage(element.boom, element.x, element.y, 32, 32);
     });
