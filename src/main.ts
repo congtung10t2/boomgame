@@ -12,7 +12,7 @@ var myGameArea = {
     }
 }
 var booms = new Array();
-var canSetBoom = false;
+var canSetBoom = true;
 var img_obj = {
     'source': null,
     'current': 0,
@@ -29,7 +29,6 @@ var transform = {
     'vspeed':0
 }
 
-var time = 10;
 var maxBoom = 10;
 
 var onDown = function (key:any){
@@ -37,6 +36,9 @@ var onDown = function (key:any){
         if(booms.length < maxBoom && canSetBoom){
             booms.push({boom:boom, time:30, x: transform.x, y: transform.y});
             canSetBoom = false;
+             var alarm = setTimeout(function(){
+                canSetBoom = true;
+            }, 500);
         }
     }
 }
@@ -75,13 +77,6 @@ function onUpdate(){
         }
         index++;
     });
-    if(time > 0){
-        time--;
-        if(time <= 0){
-            canSetBoom = true;
-            time = 10;
-        }
-    }
 }
 
 var background = new Image();
