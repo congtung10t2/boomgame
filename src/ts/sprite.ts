@@ -16,7 +16,7 @@ function draw_anim(context:any, iobj:any, transform:any) { // context is the can
                           iobj.width, iobj.height,
                           transform.x, transform.y, iobj.width, iobj.height);
         }
-        if(transform.vspeed > 0 || transform.hspeed > 0)
+        if(transform.vspeed != 0 || transform.hspeed != 0)
     iobj.current = (iobj.current+1) % iobj.total_frames;
     transform.y += transform.vspeed;
     transform.x += transform.hspeed;
