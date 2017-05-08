@@ -19,7 +19,7 @@ var myGameArea = {
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
     }
 }
-
+var map:OrthogonalMap;
 
 // Map tile data
 var mapData = [
@@ -110,6 +110,7 @@ function onUpdate(){
     }
     transform.y += transform.vspeed;
     transform.x += transform.hspeed;
+    map.updateEnemy();
     var index = 0;
     booms.forEach(element => {
         element.time -= 1;
@@ -122,8 +123,9 @@ function onUpdate(){
     });
     getExplosion().forEach(element => {
         if(element.x >=0 && element.y >=0 && element.x < mapData[0].length && element.y < mapData.length){
-            if( mapData[element.y][element.x] != 2){
+            if( mapData[element.y][element.x] != 2 && mapData[element.y][element.x] != 0){
                 mapData[element.y][element.x]  = 0;
+                map.initTiles();
             }
             var index = 0;
             booms.forEach(boom => {
@@ -143,7 +145,7 @@ function onUpdate(){
 
 var runnerImage = new Image();
 var boom = new Image();
-var map:OrthogonalMap;
+
 async function initializeImages() {
     myGameArea.start();
     var load = initTile().then(function(count){
@@ -153,6 +155,7 @@ async function initializeImages() {
     })
     var val = await load;
     setMapData(mapData);
+    map.initTiles();
     explosionCell.src = 'assets/fire.png';
     boom.src = 'assets/bomb.png'
     boom.onload = function (e:any) {

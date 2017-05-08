@@ -61,26 +61,85 @@ class Tile {
   type:any;
   ctx:any;
   image:any;
-  constructor (size:any, type:any, ctx:any) {
+  public xPos:any;
+  public yPos:any;
+  constructor (size:any, type:any, ctx:any, x:any, y:any) {
     this.size = size
     this.type = type
     this.ctx = ctx
     this.image = this.type.image;
+    this.xPos = x * this.size
+    this.yPos = y * this.size
+  }
+
+  public getType(){
+    return this.type;
   }
   
-  draw (x:any, y:any) {
-    // Store positions
-    const xPos = x * this.size
-    const yPos = y * this.size
-
-    // Draw tile
-    //this.ctx.src = this.type.image
-   // this.ctx.fillRect(xPos, yPos, this.size, this.size)
-    this.ctx.drawImage(space, xPos, yPos, this.size, this.size)
-    if(space != this.image)
-    this.ctx.drawImage(this.image, xPos, yPos, this.size, this.size)
-
+  public draw () {
+    //this.ctx.drawImage(space, this.xPos, this.yPos, this.size, this.size)
+    //if(space != this.image)
+    this.ctx.drawImage(this.image, this.xPos, this.yPos, this.size, this.size)
   }
+}
+
+class Enemy extends Tile {
+    hspeed = 0;
+    vspeed = 0;
+    public setVSpeed(speed:any){
+      this.vspeed = speed;
+    }
+
+    public setHSpeed(speed:any){
+      this.hspeed = speed;
+    }
+
+    public update(tiles:Tile[][]){
+
+      var x = Math.round(this.xPos/40);
+      var y = Math.round(this.yPos/40);
+      if(this.hspeed > 0){
+          if(((x < tiles[y].length - 1) && (tiles[y][x+1].getType() == TILE_TYPES[1] || tiles[y][x+1].getType() == TILE_TYPES[2])) || (x >= tiles[y].length - 1)){
+              if((this.xPos + this.hspeed)/40 > x){
+                
+                this.hspeed = -this.hspeed;
+                this.vspeed = 0;
+                if(x > 0 && (tiles[y][x-1].getType() == TILE_TYPES[1] || tiles[y][x-1].getType() == TILE_TYPES[2])){
+                   this.vspeed = this.hspeed;
+                   this.hspeed = 0;
+                }
+              }
+          } 
+      }
+      if(this.vspeed > 0){
+        if(((y < tiles.length - 1) && (tiles[y+1][x].getType() == TILE_TYPES[1] || tiles[y+1][x].getType() == TILE_TYPES[2])) || (y >= tiles.length - 1)){
+            if((this.yPos + this.vspeed)/40 > y){
+                this.vspeed = -this.vspeed;
+                this.hspeed = 0;
+            }
+        }
+      }
+      
+
+      if(this.hspeed < 0){
+        if(((x > 0) && (tiles[y][x-1].getType() == TILE_TYPES[1] || tiles[y][x-1].getType() == TILE_TYPES[2])) || (x <= 0)){
+            if((this.xPos + this.hspeed)/40 <= x){
+                this.hspeed = -this.hspeed;
+                this.vspeed = 0;
+            }
+        }
+      }
+      if(this.vspeed < 0){
+        if(((y > 0) && (tiles[y-1][x].getType() == TILE_TYPES[1] || tiles[y-1][x].getType() == TILE_TYPES[2])) || (y <=0)){
+            if((this.yPos + this.vspeed)/40 <= y){
+                this.vspeed = -this.vspeed;
+                this.hspeed = 0;
+            }
+        }
+      }
+      this.xPos += this.hspeed;
+      this.yPos += this.vspeed;
+    }
 }
 class Map {
   canvas:any;
@@ -106,13 +165,17 @@ export class OrthogonalMap extends Map {
   constructor (canvas:any, data:any, opts:any) {
     super(canvas, data, opts)
   }
-  
-  public draw () {
+  enemies: Enemy[][];
+  tiles: Tile[][];
+
+  public initTiles(){
+    this.tiles = [];
+    this.enemies = [];
     const numCols = this.data[0].length
     const numRows = this.data.length
-    
-    // Iterate through map data and draw each tile
     for (let y = 0; y < numRows; y++) {
+      this.tiles[y] = [];
+      this.enemies[y] = [];
       for (let x = 0; x < numCols; x++) {
 
         // Get tile ID from map data
@@ -122,9 +185,39 @@ export class OrthogonalMap extends Map {
         const tileType = TILE_TYPES[tileId]
 
         // Create tile instance and draw to our canvas
-        new Tile(this.tileSize, tileType, this.ctx).draw(x, y)
+         if(tileId != 3){
+            this.tiles[y][x] = new Tile(this.tileSize, tileType, this.ctx, x, y);
+         } else {
+           this.data[y][x] = 0;
+            this.tiles[y][x] = new Tile(this.tileSize, TILE_TYPES[0], this.ctx, x, y);
+            this.enemies[y][x] = new Enemy(this.tileSize, tileType, this.ctx, x, y);
+            this.enemies[y][x].setHSpeed(3);
+         }
+        
 
       }
     }
+  }
+
+  public updateEnemy(){
+      this.enemies.forEach(element => {
+       element.forEach(enemy => {
+         enemy.update(this.tiles);
+       });
+    });
+  }
+  
+  public draw () {
+    this.tiles.forEach(element => {
+       element.forEach(tile => {
+         tile.draw();
+       });
+    });
+
+    this.enemies.forEach(element => {
+       element.forEach(enemy => {
+         enemy.draw();
+       });
+    });
   }
 }
