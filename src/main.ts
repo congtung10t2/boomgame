@@ -19,27 +19,28 @@ var myGameArea = {
 
 // Map tile data
 const mapData = [
-  [1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 2, 1, 0, 1, 1, 2, 1, 0]
+  [0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 2, 0, 0, 0],
+  [0, 2, 0, 2, 0, 2, 1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0],
+  [1, 1, 1, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1, 2, 0, 2, 1, 2, 0, 0],
+  [0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 2, 0],
+  [0, 2, 0, 2, 0, 2, 1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0],
+  [1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 3, 0],
+  [1, 2, 0, 2, 3, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0],
+  [0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0],
+  [0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 1, 0, 2, 0, 1, 2, 1, 2, 0],
+  [0, 2, 0, 2, 0, 2, 0, 2, 0, 1, 0, 1, 0, 2, 0, 2, 0, 1, 0, 2],
+  [0, 1, 0, 2, 0, 1, 0, 2, 0, 2, 0, 2, 0, 2, 0, 1, 1, 1, 0, 0],
+  [0, 0, 1, 0, 1, 0, 0, 0, 3, 1, 0, 1, 1, 1, 1, 1, 2, 0, 0, 0],
+  [0, 2, 0, 2, 0, 2, 1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0],
+  [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1],
+  [0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1, 2, 0, 2, 1, 2, 0, 0],
+  [0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 2, 0],
+  [0, 2, 0, 2, 0, 2, 1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0],
+  [1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 3],
+  [1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0]
 ]
+const TILE_SIZE = 40;
 
 
 var booms = new Array();
@@ -65,7 +66,7 @@ var maxBoom = 10;
 var onDown = function (key:any){
     if(key == "space"){
         if(booms.length < maxBoom && canSetBoom){
-            booms.push({boom:boom, time:30, x: transform.x, y: transform.y});
+            booms.push({boom:boom, time:30, x: Math.round(transform.x/TILE_SIZE)*TILE_SIZE, y: Math.round(transform.y/TILE_SIZE)*TILE_SIZE});
             canSetBoom = false;
              var alarm = setTimeout(function(){
                 canSetBoom = true;
@@ -112,21 +113,19 @@ function onUpdate(){
     
 }
 
-var background = new Image();
 var runnerImage = new Image();
 var boom = new Image();
 var map:OrthogonalMap;
 async function initializeImages() {
     myGameArea.start();
     var load = initTile().then(function(count){
-        map = new OrthogonalMap(myGameArea.canvas, mapData, { tileSize: 40 })
+        map = new OrthogonalMap(myGameArea.canvas, mapData, { tileSize: TILE_SIZE })
     }).catch(function(reason){
             console.log(reason);
     })
     var val = await load;
-    background.src = 'assets/desert.png';
         boom.src = 'assets/bomb.png'
-        background.onload = function (e:any) {
+        boom.onload = function (e:any) {
             
             setOnDownCallback(onDown);
             setOnUpCallback(onUp);
@@ -139,9 +138,6 @@ function loop(){
                     onUpdate();
                     onDraw();
     }, 100);
-}
-function drawBackground() {
- myGameArea.canvas.getContext("2d").drawImage(background, 0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
 }
 
 function drawRunner() {
@@ -157,7 +153,6 @@ function onDraw() {
     
     context.save();
     context.clearRect(0, 0, 800, 600);
-    drawBackground();
     map.draw();
     booms.forEach(element => {
         myGameArea.canvas.getContext("2d").drawImage(element.boom, element.x, element.y, 32, 32);

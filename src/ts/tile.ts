@@ -1,9 +1,11 @@
 var ghost = new Image();
 var wall = new Image();
 var space = new Image();
+var staticWall = new Image();
 const TILE_TYPES = [
-  { name: 'wall', image: wall },
   { name: 'space', image: space },
+  { name: 'wall', image: wall },
+  { name: 'staticWall', image: staticWall },
   { name: 'enemy', image: ghost }
 ]
 export function initTile(){
@@ -12,19 +14,25 @@ export function initTile(){
       ghost.src = 'assets/ghost.png';
       wall.src = 'assets/wall.png';
       space.src = 'assets/space.jpg';
+      staticWall.src = 'assets/static_wall.jpg'
       ghost.onload  = function (e:any) {
         count++;
-        if(count == 3)
+        if(count == 4)
+         return resolve(count);
+      }
+      staticWall.onload  = function (e:any) {
+        count++;
+        if(count == 4)
          return resolve(count);
       }
       wall.onload  = function (e:any) {
         count++;
-        if(count == 3)
+        if(count == 4)
          return resolve(count);
       }
       space.onload  = function (e:any) {
         count++;
-        if(count == 3)
+        if(count == 4)
          return resolve(count);
       }
 
@@ -38,6 +46,10 @@ export function initTile(){
 
       
       space.onerror = function(e:any){
+        reject("load failed");
+      }
+      
+      staticWall.onerror = function(e:any){
         reject("load failed");
       }
       
@@ -64,7 +76,9 @@ class Tile {
     // Draw tile
     //this.ctx.src = this.type.image
    // this.ctx.fillRect(xPos, yPos, this.size, this.size)
-      this.ctx.drawImage(this.image, xPos, yPos, this.size, this.size)
+    this.ctx.drawImage(space, xPos, yPos, this.size, this.size)
+    if(space != this.image)
+    this.ctx.drawImage(this.image, xPos, yPos, this.size, this.size)
 
   }
 }
