@@ -1,7 +1,7 @@
 
 
 var img = new Image();
-
+var mapData = new Array();
 
 function draw_anim(context:any, iobj:any, transform:any) { // context is the canvas 2d context.
     
@@ -18,8 +18,6 @@ function draw_anim(context:any, iobj:any, transform:any) { // context is the can
         }
         if(transform.vspeed != 0 || transform.hspeed != 0)
     iobj.current = (iobj.current+1) % iobj.total_frames;
-    transform.y += transform.vspeed;
-    transform.x += transform.hspeed;
     }
 
 }

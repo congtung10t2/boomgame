@@ -108,6 +108,8 @@ function onUpdate(){
     } else {
         transform.vspeed = 0;
     }
+    transform.y += transform.vspeed;
+    transform.x += transform.hspeed;
     var index = 0;
     booms.forEach(element => {
         element.time -= 1;
@@ -123,8 +125,19 @@ function onUpdate(){
             if( mapData[element.y][element.x] != 2){
                 mapData[element.y][element.x]  = 0;
             }
+            var index = 0;
+            booms.forEach(boom => {
+                if(Math.round(boom.x/40) == element.x && Math.round(boom.y/40) == element.y){
+                    exlosion(myGameArea.canvas, element.x, element.y);
+                    booms.splice(index, 1);
+                    
+                }
+                index++;
+            });
         }
+        
     });
+
     
 }
 
