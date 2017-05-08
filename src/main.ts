@@ -5,6 +5,8 @@ import { setOnUpCallback } from "./ts/input";
 import { getKeyDir } from "./ts/input";
 import { initTile } from "./ts/tile";
 import { OrthogonalMap } from "./ts/tile";
+import { drawExplosion } from "./ts/explosion";
+import { exlosion } from "./ts/explosion";
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
@@ -18,7 +20,7 @@ var myGameArea = {
 
 
 // Map tile data
-const mapData = [
+var mapData = [
   [0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 2, 0, 0, 0],
   [0, 2, 0, 2, 0, 2, 1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 0],
   [1, 1, 1, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -79,6 +81,8 @@ var onUp = function (key:any){
     
 }
 
+var explosionCell = new Image();
+
 function onUpdate(){
     
     if((getKeyDir() & 1) != 0){
@@ -106,7 +110,9 @@ function onUpdate(){
     booms.forEach(element => {
         element.time -= 1;
         if(element.time <= 0){
+            exlosion(myGameArea.canvas, Math.round(element.x/40), Math.round(element.y/40));
             booms.splice(index, 1);
+            
         }
         index++;
     });
@@ -124,13 +130,14 @@ async function initializeImages() {
             console.log(reason);
     })
     var val = await load;
-        boom.src = 'assets/bomb.png'
-        boom.onload = function (e:any) {
-            
-            setOnDownCallback(onDown);
-            setOnUpCallback(onUp);
-            loop()
-        };
+    explosionCell.src = 'assets/fire.png';
+    boom.src = 'assets/bomb.png'
+    boom.onload = function (e:any) {
+        
+        setOnDownCallback(onDown);
+        setOnUpCallback(onUp);
+        loop()
+    };
     
 }
 function loop(){
@@ -154,6 +161,7 @@ function onDraw() {
     context.save();
     context.clearRect(0, 0, 800, 600);
     map.draw();
+    drawExplosion(explosionCell);
     booms.forEach(element => {
         myGameArea.canvas.getContext("2d").drawImage(element.boom, element.x, element.y, 32, 32);
     });
