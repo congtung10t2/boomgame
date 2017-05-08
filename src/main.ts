@@ -7,6 +7,8 @@ import { initTile } from "./ts/tile";
 import { OrthogonalMap } from "./ts/tile";
 import { drawExplosion } from "./ts/explosion";
 import { exlosion } from "./ts/explosion";
+import { getExplosion } from"./ts/explosion";
+import { setMapData } from "./ts/explosion";
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
@@ -116,6 +118,13 @@ function onUpdate(){
         }
         index++;
     });
+    getExplosion().forEach(element => {
+        if(element.x >=0 && element.y >=0 && element.x < mapData[0].length && element.y < mapData.length){
+            if( mapData[element.y][element.x] != 2){
+                mapData[element.y][element.x]  = 0;
+            }
+        }
+    });
     
 }
 
@@ -130,6 +139,7 @@ async function initializeImages() {
             console.log(reason);
     })
     var val = await load;
+    setMapData(mapData);
     explosionCell.src = 'assets/fire.png';
     boom.src = 'assets/bomb.png'
     boom.onload = function (e:any) {
