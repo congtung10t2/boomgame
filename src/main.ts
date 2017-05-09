@@ -94,7 +94,7 @@ function isCollideAtPos(x:any, y:any){
     map.tiles.forEach(element=>{
         element.forEach(tile =>{
             if(tile.getType() == TILE_TYPES[1] || tile.getType() == TILE_TYPES[2]) 
-            if(collide({x:x, y:y, width:40, height:40}, {x:tile.xPos, y:tile.yPos, width:TILE_SIZE, height:TILE_SIZE})){
+            if(collide({x:x+5, y:y+5, width:30, height:35}, {x:tile.xPos, y:tile.yPos, width:TILE_SIZE, height:TILE_SIZE})){
                 check = true;
                 return;
             }
