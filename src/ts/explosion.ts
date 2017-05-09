@@ -105,7 +105,9 @@ export function setMapData(map:any){
 export function getExplosion(){
     return explosion;
 }
-
+export function addRange(range:any){
+    rangeBoom += range;
+}
 export function clearExplosion(){
     explosion =  new Array();
 }

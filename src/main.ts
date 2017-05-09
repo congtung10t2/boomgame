@@ -12,6 +12,7 @@ import { setMapData } from "./ts/explosion";
 import { collide } from "./ts/collision";
 import { TILE_TYPES } from "./ts/tile";
 import { clearExplosion } from "./ts/explosion";
+import { addRange } from "./ts/explosion";
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
@@ -71,7 +72,9 @@ var transform = {
 
 var live = 3;
 var isNoDieMore = true;
-var maxBoom = 10;
+var maxBoom = 1;
+var fireAddIcon = new Image();
+var items = new Array();
 
 var onDown = function (key:any){
     if(key == "space"){
@@ -184,17 +187,36 @@ function onUpdate(){
         onDead();
         return;
     }
+    items.forEach((element, index) => {
+        if(collide({x:element.x, y:element.y, width:TILE_SIZE*0.9, height:TILE_SIZE*0.9},{x:transform.x+5, y:transform.y+5, width:30, height:35})){
+            if(element.item == 'add'){
+                maxBoom += 1;
+            } else if(element.item == 'fire'){
+                addRange(1);
+            }
+            items.splice(index, 1);
+            return;
+
+        }
+    })
     getExplosion().forEach(element => {
         if(element.x >=0 && element.y >=0 && element.x < mapData[0].length && element.y < mapData.length){
             if( mapData[element.y][element.x] != 2 && mapData[element.y][element.x] != 0){
                 mapData[element.y][element.x]  = 0;
                 map.initTiles();
+                var luckyNumber = new Date().getTime();
+                if(luckyNumber%5 == 2){
+                    items.push({x: element.x * TILE_SIZE, y: element.y * TILE_SIZE, item: 'add' , image: fireAddIcon});
+                }
+                if(luckyNumber%5 == 3){
+                    items.push({x: element.x * TILE_SIZE, y: element.y * TILE_SIZE, item: 'fire' , image: explosionCell});
+                }
             }
             map.explosionTile(element.x, element.y);
             
             var index = 0;
             booms.forEach(boom => {
-                if(Math.round(boom.x/40) == element.x && Math.round(boom.y/40) == element.y){
+                if(Math.round(boom.x/TILE_SIZE) == element.x && Math.round(boom.y/TILE_SIZE) == element.y){
                     exlosion(myGameArea.canvas, element.x, element.y);
                     booms.splice(index, 1);
                     
@@ -235,29 +257,7 @@ var boom = new Image();
 var liveIcon = new Image();
 var timeNoDie = 100;
 
-async function initializeImages() {
-    myGameArea.start();
-    var load = initTile().then(function(count){
-        map = new OrthogonalMap(myGameArea.canvas, mapData, { tileSize: TILE_SIZE })
-    }).catch(function(reason){
-            console.log(reason);
-    })
-    var val = await load;
-    setMapData(mapData);
-    map.initTiles();
-    explosionCell.src = 'assets/fire.png';
-    liveIcon.src = 'assets/head.png'
-    boom.src = 'assets/bomb.png'
-    liveIcon.onload = function (e:any) {
-        setTimeout(function(){
-            isNoDieMore = false;
-        }, 3000);
-        setOnDownCallback(onDown);
-        setOnUpCallback(onUp);
-        loop()
-    };
-    
-}
+
 function loop(){
     setInterval(function () {
                     onUpdate();
@@ -283,6 +283,9 @@ function onDraw() {
     booms.forEach(element => {
         myGameArea.canvas.getContext("2d").drawImage(element.boom, element.x, element.y, 32, 32);
     });
+    items.forEach(element =>{
+        myGameArea.canvas.getContext("2d").drawImage(element.image, element.x, element.y, 32, 32);
+    });
     if(isNoDieMore){
         timeNoDie--;
         if(timeNoDie <= 0)
@@ -297,5 +300,28 @@ function onDraw() {
     
     context.restore();
 }
-
+async function initializeImages() {
+    myGameArea.start();
+    var load = initTile().then(function(count){
+        map = new OrthogonalMap(myGameArea.canvas, mapData, { tileSize: TILE_SIZE })
+    }).catch(function(reason){
+            console.log(reason);
+    })
+    var val = await load;
+    setMapData(mapData);
+    map.initTiles();
+    explosionCell.src = 'assets/fire.png';
+    liveIcon.src = 'assets/head.png'
+    fireAddIcon.src = 'assets/fire_add.png'
+    boom.src = 'assets/bomb.png'
+    liveIcon.onload = function (e:any) {
+        setTimeout(function(){
+            isNoDieMore = false;
+        }, 3000);
+        setOnDownCallback(onDown);
+        setOnUpCallback(onUp);
+        loop()
+    };
+    
+}
 initializeImages();
