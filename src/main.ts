@@ -9,6 +9,8 @@ import { drawExplosion } from "./ts/explosion";
 import { exlosion } from "./ts/explosion";
 import { getExplosion } from"./ts/explosion";
 import { setMapData } from "./ts/explosion";
+import { collide } from "./ts/collision";
+import { TILE_TYPES } from "./ts/tile";
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
@@ -62,7 +64,8 @@ var transform = {
     'x':0,
     'y':0,
     'hspeed': 0,
-    'vspeed':0
+    'vspeed':0,
+    'moving':false
 }
 
 var maxBoom = 10;
@@ -71,6 +74,7 @@ var onDown = function (key:any){
     if(key == "space"){
         if(booms.length < maxBoom && canSetBoom){
             booms.push({boom:boom, time:30, x: Math.round(transform.x/TILE_SIZE)*TILE_SIZE, y: Math.round(transform.y/TILE_SIZE)*TILE_SIZE});
+            map.tiles[Math.round(transform.y/TILE_SIZE)][Math.round(transform.x/TILE_SIZE)].getType().solid = true;
             canSetBoom = false;
              var alarm = setTimeout(function(){
                 canSetBoom = true;
@@ -85,14 +89,48 @@ var onUp = function (key:any){
 
 var explosionCell = new Image();
 
+function isCollideAtPos(x:any, y:any){
+    var check = false;
+    map.tiles.forEach(element=>{
+        element.forEach(tile =>{
+            if(tile.getType() == TILE_TYPES[1] || tile.getType() == TILE_TYPES[2]) 
+            if(collide({x:x, y:y, width:40, height:40}, {x:tile.xPos, y:tile.yPos, width:TILE_SIZE, height:TILE_SIZE})){
+                check = true;
+                return;
+            }
+        });
+        if(check == true)
+            return;
+    });
+    return check;
+}
+
 function onUpdate(){
-    
     if((getKeyDir() & 1) != 0){
         transform.hspeed = -5;
         img_obj.origin = 1;
+        transform.moving = true;
+        if(transform.x + transform.hspeed <= -10){
+                transform.hspeed = 0;
+                transform.x = -10;
+        } 
+        if(isCollideAtPos(transform.x + transform.hspeed, transform.y)){
+                transform.hspeed = 0;
+                console.log("collide shit");
+        }
+        
+        
     } else if((getKeyDir() & 4) != 0){
         transform.hspeed = 5;
         img_obj.origin = 3;
+        transform.moving = true;
+        if(transform.x + transform.hspeed >= 755){
+                transform.hspeed = 0;
+                transform.x = 755;
+        }
+        if(isCollideAtPos(transform.x + transform.hspeed, transform.y)){
+            transform.hspeed = 0;
+        }
     }
     else {
             transform.hspeed = 0;
@@ -100,14 +138,35 @@ function onUpdate(){
     if((getKeyDir() & 2) != 0){
         transform.vspeed = -5;
         img_obj.origin = 2;
+        transform.moving = true;
+        if(transform.y + transform.vspeed <= -10){
+                transform.vspeed = 0;
+                transform.y = -10;
+        }
+        if(isCollideAtPos(transform.x, transform.y + transform.vspeed)){
+            transform.vspeed = 0;
+        }
     }
     
     else if((getKeyDir() & 8) != 0){
         transform.vspeed = 5;
         img_obj.origin = 0;
+        transform.moving = true;
+        if(transform.y + transform.vspeed >= 550){
+                transform.vspeed = 0;
+                transform.y = 550;
+        }
+        if(isCollideAtPos(transform.x, transform.y + transform.vspeed)){
+            transform.vspeed = 0;
+        } else {
+            var a = 0;
+        }
+
     } else {
         transform.vspeed = 0;
+        transform.moving = false;
     }
+    
     transform.y += transform.vspeed;
     transform.x += transform.hspeed;
     map.updateEnemy();
@@ -116,6 +175,7 @@ function onUpdate(){
         element.time -= 1;
         if(element.time <= 0){
             exlosion(myGameArea.canvas, Math.round(element.x/40), Math.round(element.y/40));
+            map.tiles[Math.round(element.y/40)][Math.round(element.x/40)].getType().solid = false;
             booms.splice(index, 1);
             
         }

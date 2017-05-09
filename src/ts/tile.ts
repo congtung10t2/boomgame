@@ -2,11 +2,11 @@ var ghost = new Image();
 var wall = new Image();
 var space = new Image();
 var staticWall = new Image();
-const TILE_TYPES = [
-  { name: 'space', image: space },
-  { name: 'wall', image: wall },
-  { name: 'staticWall', image: staticWall },
-  { name: 'enemy', image: ghost }
+export const TILE_TYPES = [
+  { name: 'space', image: space, solid: false},
+  { name: 'wall', image: wall, solid: false},
+  { name: 'staticWall', image: staticWall, solid: false},
+  { name: 'enemy', image: ghost, solid: false}
 ]
 export function initTile(){
     return new Promise(function(resolve, reject){
@@ -57,7 +57,7 @@ export function initTile(){
     });
 }
 class Tile {
-  size:any;
+  public size:any;
   type:any;
   ctx:any;
   image:any;
@@ -94,17 +94,17 @@ class Enemy extends Tile {
       this.hspeed = speed;
     }
 
-    public update(tiles:Tile[][]){
+    public update(map:OrthogonalMap){
 
       var x = Math.round(this.xPos/40);
       var y = Math.round(this.yPos/40);
       if(this.hspeed > 0){
-          if(((x < tiles[y].length - 1) && (tiles[y][x+1].getType() == TILE_TYPES[1] || tiles[y][x+1].getType() == TILE_TYPES[2])) || (x >= tiles[y].length - 1)){
+          if(((x < map.tiles[y].length - 1) && map.solidObjectAtXY(x+1, y)) || (x >= map.tiles[y].length - 1)){
               if((this.xPos + this.hspeed)/40 > x){
                 
                 this.hspeed = -this.hspeed;
                 this.vspeed = 0;
-                if(x > 0 && (tiles[y][x-1].getType() == TILE_TYPES[1] || tiles[y][x-1].getType() == TILE_TYPES[2])){
+                if(x > 0 && (map.solidObjectAtXY(x-1, y)) || (x <= 0)){
                    this.vspeed = this.hspeed;
                    this.hspeed = 0;
                 }
@@ -112,7 +112,7 @@ class Enemy extends Tile {
           } 
       }
       if(this.vspeed > 0){
-        if(((y < tiles.length - 1) && (tiles[y+1][x].getType() == TILE_TYPES[1] || tiles[y+1][x].getType() == TILE_TYPES[2])) || (y >= tiles.length - 1)){
+        if(((y < map.tiles.length-1) && map.solidObjectAtXY(x, y+1)) || (y >= map.tiles.length - 1)){
             if((this.yPos + this.vspeed)/40 > y){
                 this.vspeed = -this.vspeed;
                 this.hspeed = 0;
@@ -122,7 +122,7 @@ class Enemy extends Tile {
       
 
       if(this.hspeed < 0){
-        if(((x > 0) && (tiles[y][x-1].getType() == TILE_TYPES[1] || tiles[y][x-1].getType() == TILE_TYPES[2])) || (x <= 0)){
+        if(((x > 0) && map.solidObjectAtXY(x-1, y)) || (x <= 0)){
             if((this.xPos + this.hspeed)/40 <= x){
                 this.hspeed = -this.hspeed;
                 this.vspeed = 0;
@@ -130,7 +130,7 @@ class Enemy extends Tile {
         }
       }
       if(this.vspeed < 0){
-        if(((y > 0) && (tiles[y-1][x].getType() == TILE_TYPES[1] || tiles[y-1][x].getType() == TILE_TYPES[2])) || (y <=0)){
+        if(((y > 0) && map.solidObjectAtXY(x, y-1)) || (y <=0)){
             if((this.yPos + this.vspeed)/40 <= y){
                 this.vspeed = -this.vspeed;
                 this.hspeed = 0;
@@ -165,16 +165,16 @@ export class OrthogonalMap extends Map {
   constructor (canvas:any, data:any, opts:any) {
     super(canvas, data, opts)
   }
-  enemies: Enemy[][];
-  tiles: Tile[][];
-
+  enemies: Enemy[][] = [];
+  public tiles: Tile[][];
+  initEnemy = true;
   public initTiles(){
     this.tiles = [];
-    this.enemies = [];
     const numCols = this.data[0].length
     const numRows = this.data.length
     for (let y = 0; y < numRows; y++) {
       this.tiles[y] = [];
+      if(this.initEnemy)
       this.enemies[y] = [];
       for (let x = 0; x < numCols; x++) {
 
@@ -197,12 +197,17 @@ export class OrthogonalMap extends Map {
 
       }
     }
+    this.initEnemy = false;
+  }
+
+  public solidObjectAtXY(x:any, y:any){
+    return (this.tiles[y][x].getType() == TILE_TYPES[2] || this.tiles[y][x].getType() == TILE_TYPES[1] || this.tiles[y][x].getType().solid);
   }
 
   public updateEnemy(){
       this.enemies.forEach(element => {
        element.forEach(enemy => {
-         enemy.update(this.tiles);
+         enemy.update(this);
        });
     });
   }
