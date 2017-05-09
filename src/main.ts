@@ -11,6 +11,7 @@ import { getExplosion } from"./ts/explosion";
 import { setMapData } from "./ts/explosion";
 import { collide } from "./ts/collision";
 import { TILE_TYPES } from "./ts/tile";
+import { clearExplosion } from "./ts/explosion";
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
@@ -69,7 +70,7 @@ var transform = {
 }
 
 var live = 3;
-
+var isNoDieMore = true;
 var maxBoom = 10;
 
 var onDown = function (key:any){
@@ -180,16 +181,8 @@ function onUpdate(){
         index++;
     });
     if(map.enemiesCollideAt(Math.round(transform.x/40), Math.round(transform.y/40))){
-        transform.x = 0;
-        transform.y = 0;
-        transform.hspeed = 0;
-        transform.vspeed = 0;
-        transform.moving = false;
-        live--;
-        if(live == 0){
-            alert("you're lose, refresh page to play again");
-        }
-
+        onDead();
+        return;
     }
     getExplosion().forEach(element => {
         if(element.x >=0 && element.y >=0 && element.x < mapData[0].length && element.y < mapData.length){
@@ -198,6 +191,7 @@ function onUpdate(){
                 map.initTiles();
             }
             map.explosionTile(element.x, element.y);
+            
             var index = 0;
             booms.forEach(boom => {
                 if(Math.round(boom.x/40) == element.x && Math.round(boom.y/40) == element.y){
@@ -207,6 +201,10 @@ function onUpdate(){
                 }
                 index++;
             });
+            if(Math.round(transform.x/40) == element.x &&  Math.round(transform.y/40) == element.y){
+                onDead();
+                return;
+            }
         }
         
     });
@@ -214,9 +212,28 @@ function onUpdate(){
     
 }
 
+function onDead(){
+    if(isNoDieMore) return;
+    transform.x = 0;
+    transform.y = 0;
+    transform.hspeed = 0;
+    transform.vspeed = 0;
+    transform.moving = false;
+    live--;
+    if(live <= 0){
+        alert("you're lose, Page will refresh to play again");
+        location.reload();
+    }
+    isNoDieMore = true;
+    setTimeout(function(){
+        isNoDieMore = false;
+    }, 3000);
+}
+
 var runnerImage = new Image();
 var boom = new Image();
 var liveIcon = new Image();
+var timeNoDie = 100;
 
 async function initializeImages() {
     myGameArea.start();
@@ -232,7 +249,9 @@ async function initializeImages() {
     liveIcon.src = 'assets/head.png'
     boom.src = 'assets/bomb.png'
     liveIcon.onload = function (e:any) {
-        
+        setTimeout(function(){
+            isNoDieMore = false;
+        }, 3000);
         setOnDownCallback(onDown);
         setOnUpCallback(onUp);
         loop()
@@ -264,6 +283,13 @@ function onDraw() {
     booms.forEach(element => {
         myGameArea.canvas.getContext("2d").drawImage(element.boom, element.x, element.y, 32, 32);
     });
+    if(isNoDieMore){
+        timeNoDie--;
+        if(timeNoDie <= 0)
+        timeNoDie = 100;
+        if(Math.round(timeNoDie/4) % 2 == 0)
+        drawRunner();
+    } else 
     drawRunner();
     for(var i = 0; i < live; i++){
         myGameArea.canvas.getContext("2d").drawImage(liveIcon, 30 + i*40, 550, 30, 30);

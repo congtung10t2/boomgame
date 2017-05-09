@@ -105,3 +105,7 @@ export function setMapData(map:any){
 export function getExplosion(){
     return explosion;
 }
+
+export function clearExplosion(){
+    explosion =  new Array();
+}
