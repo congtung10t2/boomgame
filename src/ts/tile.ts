@@ -90,6 +90,7 @@ class Tile {
 class Enemy extends Tile {
     hspeed = 0;
     vspeed = 0;
+    public live = true;
     public setVSpeed(speed:any){
       this.vspeed = speed;
     }
@@ -98,8 +99,17 @@ class Enemy extends Tile {
       this.hspeed = speed;
     }
 
-    public update(map:OrthogonalMap){
+    public check(x:any, y:any){
+      var xCheck = Math.round(this.xPos/40);
+      var yCheck = Math.round(this.yPos/40);
+      if(x == xCheck && y == yCheck){
+        return true;
+      }
+      return false;
+    }
 
+    public update(map:OrthogonalMap){
+      if(!this.live) return;
       var x = Math.round(this.xPos/40);
       var y = Math.round(this.yPos/40);
       if(this.hspeed > 0){
@@ -144,6 +154,13 @@ class Enemy extends Tile {
       this.xPos += this.hspeed;
       this.yPos += this.vspeed;
     }
+
+    public draw () {
+    //this.ctx.drawImage(space, this.xPos, this.yPos, this.size, this.size)
+    //if(space != this.image)
+    if(this.live)
+    this.ctx.drawImage(this.image, this.xPos, this.yPos, this.size, this.size)
+  }
 }
 class Map {
   canvas:any;
@@ -204,6 +221,36 @@ export class OrthogonalMap extends Map {
     this.initEnemy = false;
   }
 
+  public explosionTile(x:any, y:any){
+    var result = false;
+      this.enemies.forEach(element => {
+       element.forEach(enemy => {
+         if(enemy.check(x, y)){
+           result = true;
+           enemy.live = false;
+           return;
+         }
+       });
+       if(result)
+        return;
+      });
+  }
+
+  public enemiesCollideAt(x:any, y:any){
+    var result = false;
+      this.enemies.forEach(element => {
+       element.forEach(enemy => {
+         if(enemy.check(x, y)){
+           result = true;
+           return;
+         }
+       });
+       if(result)
+        return;
+      });
+      return result;
+  }
+
   public solidObjectAtXY(x:any, y:any){
     return (this.tiles[y][x].getType() == TILE_TYPES[2] || this.tiles[y][x].getType() == TILE_TYPES[1] || this.tiles[y][x].getType() == TILE_TYPES[4]);
   }
@@ -217,7 +264,7 @@ export class OrthogonalMap extends Map {
        element.forEach(enemy => {
          enemy.update(this);
        });
-    });
+      });
   }
   
   public draw () {

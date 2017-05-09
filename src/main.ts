@@ -157,10 +157,7 @@ function onUpdate(){
         }
         if(isCollideAtPos(transform.x, transform.y + transform.vspeed)){
             transform.vspeed = 0;
-        } else {
-            var a = 0;
-        }
-
+        } 
     } else {
         transform.vspeed = 0;
         transform.moving = false;
@@ -180,12 +177,21 @@ function onUpdate(){
         }
         index++;
     });
+    if(map.enemiesCollideAt(Math.round(transform.x/40), Math.round(transform.y/40))){
+        transform.x = 0;
+        transform.y = 0;
+        transform.hspeed = 0;
+        transform.vspeed = 0;
+        transform.moving = false;
+        
+    }
     getExplosion().forEach(element => {
         if(element.x >=0 && element.y >=0 && element.x < mapData[0].length && element.y < mapData.length){
             if( mapData[element.y][element.x] != 2 && mapData[element.y][element.x] != 0){
                 mapData[element.y][element.x]  = 0;
                 map.initTiles();
             }
+            map.explosionTile(element.x, element.y);
             var index = 0;
             booms.forEach(boom => {
                 if(Math.round(boom.x/40) == element.x && Math.round(boom.y/40) == element.y){
