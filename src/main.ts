@@ -74,7 +74,7 @@ var onDown = function (key:any){
     if(key == "space"){
         if(booms.length < maxBoom && canSetBoom){
             booms.push({boom:boom, time:30, x: Math.round(transform.x/TILE_SIZE)*TILE_SIZE, y: Math.round(transform.y/TILE_SIZE)*TILE_SIZE});
-            map.tiles[Math.round(transform.y/TILE_SIZE)][Math.round(transform.x/TILE_SIZE)].getType().solid = true;
+            map.setSolid(true, Math.round(transform.x/TILE_SIZE), Math.round(transform.y/TILE_SIZE));
             canSetBoom = false;
              var alarm = setTimeout(function(){
                 canSetBoom = true;
@@ -116,7 +116,6 @@ function onUpdate(){
         } 
         if(isCollideAtPos(transform.x + transform.hspeed, transform.y)){
                 transform.hspeed = 0;
-                console.log("collide shit");
         }
         
         
@@ -175,7 +174,7 @@ function onUpdate(){
         element.time -= 1;
         if(element.time <= 0){
             exlosion(myGameArea.canvas, Math.round(element.x/40), Math.round(element.y/40));
-            map.tiles[Math.round(element.y/40)][Math.round(element.x/40)].getType().solid = false;
+            map.setSolid(false, Math.round(element.x/TILE_SIZE), Math.round(element.y/TILE_SIZE));
             booms.splice(index, 1);
             
         }

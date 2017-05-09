@@ -3,10 +3,11 @@ var wall = new Image();
 var space = new Image();
 var staticWall = new Image();
 export const TILE_TYPES = [
-  { name: 'space', image: space, solid: false},
-  { name: 'wall', image: wall, solid: false},
-  { name: 'staticWall', image: staticWall, solid: false},
-  { name: 'enemy', image: ghost, solid: false}
+  { name: 'space', image: space},
+  { name: 'wall', image: wall},
+  { name: 'staticWall', image: staticWall},
+  { name: 'enemy', image: ghost},
+  { name: 'boom', image: space}
 ]
 export function initTile(){
     return new Promise(function(resolve, reject){
@@ -70,6 +71,9 @@ class Tile {
     this.image = this.type.image;
     this.xPos = x * this.size
     this.yPos = y * this.size
+  }
+  public setSolid(isSolid:boolean){
+    this.type = isSolid?TILE_TYPES[4]:TILE_TYPES[0];
   }
 
   public getType(){
@@ -201,7 +205,11 @@ export class OrthogonalMap extends Map {
   }
 
   public solidObjectAtXY(x:any, y:any){
-    return (this.tiles[y][x].getType() == TILE_TYPES[2] || this.tiles[y][x].getType() == TILE_TYPES[1] || this.tiles[y][x].getType().solid);
+    return (this.tiles[y][x].getType() == TILE_TYPES[2] || this.tiles[y][x].getType() == TILE_TYPES[1] || this.tiles[y][x].getType() == TILE_TYPES[4]);
+  }
+
+  public setSolid(isSolid:boolean,x:any, y:any){
+    this.tiles[y][x].setSolid(isSolid);
   }
 
   public updateEnemy(){
