@@ -225,7 +225,7 @@ export class OrthogonalMap extends Map {
     var result = false;
       this.enemies.forEach(element => {
        element.forEach(enemy => {
-         if(enemy.check(x, y)){
+         if(enemy.live && enemy.check(x, y)){
            result = true;
            enemy.live = false;
            return;
@@ -234,13 +234,28 @@ export class OrthogonalMap extends Map {
        if(result)
         return;
       });
+      if(!result) return;
+      var check = false;
+      this.enemies.forEach(element => {
+       element.forEach(enemy => {
+         if(enemy.live && enemy.xPos > 0 && enemy.yPos > 0 && enemy.xPos < 800 && enemy.yPos < 600){
+           check = true;
+           return;
+         }
+       });
+       if(check) 
+       return;
+      });
+      if(!check){
+        alert("you win");
+      }
   }
 
   public enemiesCollideAt(x:any, y:any){
     var result = false;
       this.enemies.forEach(element => {
        element.forEach(enemy => {
-         if(enemy.check(x, y)){
+         if(enemy.live && enemy.check(x, y)){
            result = true;
            return;
          }

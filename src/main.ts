@@ -68,6 +68,8 @@ var transform = {
     'moving':false
 }
 
+var live = 3;
+
 var maxBoom = 10;
 
 var onDown = function (key:any){
@@ -151,9 +153,9 @@ function onUpdate(){
         transform.vspeed = 5;
         img_obj.origin = 0;
         transform.moving = true;
-        if(transform.y + transform.vspeed >= 550){
+        if(transform.y + transform.vspeed >= 560){
                 transform.vspeed = 0;
-                transform.y = 550;
+                transform.y = 560;
         }
         if(isCollideAtPos(transform.x, transform.y + transform.vspeed)){
             transform.vspeed = 0;
@@ -183,7 +185,11 @@ function onUpdate(){
         transform.hspeed = 0;
         transform.vspeed = 0;
         transform.moving = false;
-        
+        live--;
+        if(live == 0){
+            alert("you're lose, refresh page to play again");
+        }
+
     }
     getExplosion().forEach(element => {
         if(element.x >=0 && element.y >=0 && element.x < mapData[0].length && element.y < mapData.length){
@@ -210,6 +216,7 @@ function onUpdate(){
 
 var runnerImage = new Image();
 var boom = new Image();
+var liveIcon = new Image();
 
 async function initializeImages() {
     myGameArea.start();
@@ -222,8 +229,9 @@ async function initializeImages() {
     setMapData(mapData);
     map.initTiles();
     explosionCell.src = 'assets/fire.png';
+    liveIcon.src = 'assets/head.png'
     boom.src = 'assets/bomb.png'
-    boom.onload = function (e:any) {
+    liveIcon.onload = function (e:any) {
         
         setOnDownCallback(onDown);
         setOnUpCallback(onUp);
@@ -257,6 +265,9 @@ function onDraw() {
         myGameArea.canvas.getContext("2d").drawImage(element.boom, element.x, element.y, 32, 32);
     });
     drawRunner();
+    for(var i = 0; i < live; i++){
+        myGameArea.canvas.getContext("2d").drawImage(liveIcon, 30 + i*40, 550, 30, 30);
+    }
     
     context.restore();
 }
